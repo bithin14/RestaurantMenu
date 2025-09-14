@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Restaurant Menu</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style> body {
+      background: url('https://t3.ftcdn.net/jpg/05/89/70/46/360_F_589704609_b84XoVDaeopctL2Iz0lG4IQT86Dzm7xz.jpg') no-repeat center center fixed;
+      background-size: cover;
+      min-height: 100vh;
+      color: #fff;
+    }
+    .content-wrapper {
+      background: rgba(0, 0, 0, 0.6); /* dark overlay for readability */
+      padding: 20px;
+      border-radius: 12px;
+    }
+    h1, h3 {
+      color: blue; 
+    }</style>
+     
+</head>
+<body class="container py-4">
+  <h1 class ="text-center mb-4" style="color: blue; text-shadow: 2px 2px 4px #000;">Welcome to JBS Restaurant</h1>
+  <h1 class="mb-4">Restaurant Menu</h1>
+
+  <!-- Category Section -->
+  <div class="mb-4">
+    <h3>Categories</h3>
+    <div id="categories" class="d-flex flex-wrap gap-2"></div>
+  </div>
+
+  <!-- Subcategory Section -->
+  <div class="mb-4" id="subcategory-section" style="display:none;">
+    <h3>Subcategories</h3>
+    <div id="subcategories" class="d-flex flex-wrap gap-2"></div>
+  </div>
+
+  <!-- Items Section -->
+  <div class="mb-4">
+    <h3>Items</h3>
+    <div id="items" class="d-flex flex-column gap-2"></div>
+  </div>
+
+  <!-- Ordered Items Section -->
+  <div class="mb-4">
+    <h3>Ordered Items</h3>
+    <ol id="orderedItems"></ol>
+  </div>
+
+  <!-- Import Menu.js and custom script -->
+  <script type="module">
+    import menu from './Restaurant_menu.js';
+
+    let selectedCategory = null;
+    let selectedSubcategory = null;
+    let orderedItems = [];
+
+    const categoriesDiv = document.getElementById("categories");
+    const subcategoriesDiv = document.getElementById("subcategories");
+    const itemsDiv = document.getElementById("items");
+    const orderedItemsOl = document.getElementById("orderedItems");
+    const subcategorySection = document.getElementById("subcategory-section");
+
+    // Render Categories
+    menu.forEach(cat => {
+      const btn = document.createElement("button");
+      btn.className = "btn btn-primary";
+      btn.textContent = cat.category;
+      btn.onclick = () => handleCategorySelect(cat);
+      categoriesDiv.appendChild(btn);
+    });
+
+    function handleCategorySelect(cat) {
+      selectedCategory = cat;
+      selectedSubcategory = null;
+
+      // Clear previous subcategories & items
+      subcategoriesDiv.innerHTML = "";
+      itemsDiv.innerHTML = "";
+
+      if (cat.subcategories) {
+        subcategorySection.style.display = "block";
+        cat.subcategories.forEach(sub => {
+          const btn = document.createElement("button");
+          btn.className = "btn btn-secondary";
+          btn.textContent = sub.type;
+          btn.onclick = () => handleSubcategorySelect(sub);
+          subcategoriesDiv.appendChild(btn);
+        });
+      } else {
+        subcategorySection.style.display = "none";
+        renderItems(cat.items);
+      }
+    }
+
+    function handleSubcategorySelect(sub) {
+      selectedSubcategory = sub;
+      itemsDiv.innerHTML = "";
+      renderItems(sub.items);
+    }
+
+    function renderItems(items) {
+      items.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "d-flex justify-content-between align-items-center border p-2 rounded";
+        div.innerHTML = `
+          <span>${item}</span>
+          <button class="btn btn-sm btn-success">Order Item</button>
+        `;
+        div.querySelector("button").onclick = () => handleOrderItem(item);
+        itemsDiv.appendChild(div);
+      });
+    }
+
+    function handleOrderItem(item) {
+      orderedItems.push(item);
+      updateOrderedItems();
+    }
+
+    function updateOrderedItems() {
+      orderedItemsOl.innerHTML = "";
+      orderedItems.forEach((item, index) => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        orderedItemsOl.appendChild(li);
+      });
+    }
+  </script>
+</body>
+</html>
